@@ -4,6 +4,16 @@ const Cart = require('../models/Cart')
 const User = require('../models/Cart')
 
 
+
+const show = async (req, res, next) => {
+    try {
+        const cart = await Cart.find({ user: req.query.id})
+        res.status(200).json(cart)
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 const create = async (req, res, next) => {
     try {
         const cart = {
@@ -30,4 +40,4 @@ const create = async (req, res, next) => {
     }
 }
 
-module.exports = { create }
+module.exports = { create, show }

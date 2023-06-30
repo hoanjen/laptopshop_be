@@ -1,5 +1,6 @@
 
 const Brand = require('../models/Brand')
+const Product = require('../models/Product')
 
 const create = async (req, res, next) => {
     try {
@@ -16,6 +17,15 @@ const create = async (req, res, next) => {
     }
 }
 
+const test = async (req, res, next) => {
+    try {
+        const product = await Product.find({}).populate('brand')
+        console.log(product)
+        res.status(200).json(product)
+    } catch (error) {
+
+    }
+}
 const show = async (req, res, next) => {
     try {
         let brand = await Brand.find({})
@@ -25,4 +35,4 @@ const show = async (req, res, next) => {
    }
 }
 
-module.exports = {create, show}
+module.exports = {create, show, test}

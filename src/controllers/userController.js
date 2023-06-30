@@ -38,7 +38,8 @@ const signup = async (req, res, next) => {
             name : req.body.name,
             email: req.body.email,
             password: hashedPassword,
-            address: req.body.address
+            address: req.body.address,
+            phone: req.body.phone
         }
         
         const user = new User(newUser)

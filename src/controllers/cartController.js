@@ -15,21 +15,21 @@ const show = async (req, res, next) => {
 }
 
 const create = async (req, res, next) => {
+    console.log(req)
     try {
         const cart = {
-            user: req.body.user,
+            user: req.user._id,
             product: req.body.product,
             quantity: req.body.quantity
         }
-        const check = await Cart.findOne({
-            user: req.body.user,
+        let check = await Cart.findOne({
+            user: req.user._id,
             product: req.body.product
         })
 
-        let newCart
         if(check === null){
-            newCart = new Cart(cart)
-            await newCart.save()
+            check = new Cart(cart)
+            await check.save()
         }else{
             check.quantity = check.quantity + parseInt(req.body.quantity,10)
             await check.save()

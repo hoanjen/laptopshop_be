@@ -4,7 +4,6 @@ const Schema = mongoose.Schema
 const OrderDetail = new Schema({
     order: {type: mongoose.Schema.Types.ObjectId,ref: 'User' , require: true},
     product: {type: mongoose.Schema.Types.ObjectId,ref: 'Product' , require: true},
-    price: {type: Number, require: true},
     quantity: {type: Number, require: true}
 },{
     timestamps: true

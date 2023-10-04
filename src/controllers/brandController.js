@@ -3,6 +3,9 @@ const Brand = require('../models/Brand')
 const Product = require('../models/Product')
 
 const create = async (req, res, next) => {
+    if(req.user.isAdmin === false){
+        res.status(400).json({message: "you are not admin"})
+    }
     try {
         let brand = await Brand.findOne({brandName: req.body.brandName})
         if(brand === null){

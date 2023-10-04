@@ -17,7 +17,6 @@ const Product = new Schema({
     color: { type: String, require: true },
     os: { type: String, require: true },
     warranty: { type: String, require: true },
-    image:{type: String, require:true},
     slug: { type: String, slug: 'name' }
 }, {
     timestamps: true

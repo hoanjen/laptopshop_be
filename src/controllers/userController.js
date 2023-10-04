@@ -1,24 +1,23 @@
 const User = require('../models/User')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const Refresh = require('../models/Refresh')
 
-const makeAccessToken = ( userId ) =>{
+const makeAccessToken = ( userId, isAdmin ) =>{
     let infor = {
         os: 'hoanjen-access',
-        system: 'laptopshop',
         id: userId,
+        isAdmin,
         date: new Date().getTime(),
     }
     let accessToken = jwt.sign(infor, process.env.secret, { expiresIn: '10h' })
     return accessToken
 }
 
-const makeRefreshToken = ( userId ) =>{
+const makeRefreshToken = (userId, isAdmin) =>{
     let infor = {
         name: 'hoanjen-refresh',
-        system: 'laptopshop',
         id: userId,
+        isAdmin,
         date: new Date().getTime(),
     }
     let refreshToken = jwt.sign(infor, process.env.secret, { expiresIn: '100h' })
@@ -39,17 +38,12 @@ const signup = async (req, res, next) => {
             email: req.body.email,
             password: hashedPassword,
             address: req.body.address,
-            phone: req.body.phone
+            phone: req.body.phone,
+            isAdmin: req.body.isAdmin
         }
         
         const user = new User(newUser)
         await user.save()
-        const refreshToken = makeRefreshToken(user._id)
-        refresh = new Refresh({
-            user: user._id,
-            refreshToken
-        })
-        await refresh.save()
         res.status(200).send(user)
         
     } catch (error) {
@@ -60,30 +54,12 @@ const signup = async (req, res, next) => {
 
 const signin = async (req, res, next) => {
     try {
-        const user = await User.findOne({email: req.body.email})
-        if(user === null){
-            return res.status(400).json({message: 'Incorrect account or password'})
-        }
-        
-        const check = await bcrypt.compare(req.body.password, user.password)
-        if(check){
-            const refresh = await Refresh.findOne({user: user._id})
-            let refreshToken = refresh.refreshToken
-            const accessToken = makeAccessToken(user._id)
-            jwt.verify(accessToken, process.env.secret, function(err, decoded) {
-                if(err){
-                    console.log(err.name)
-                }    
-            })
-            return res.status(200).json({accessToken, refreshToken})
-        }
-        else{
-            return res.status(400).json({message: 'Incorrect account or password'})
-        }
+        const refreshToken = makeRefreshToken(req.user._id, req.user.isAdmin)
+        const accessToken = makeAccessToken(req.user._id, req.user.isAdmin)
+        return res.status(200).json({ accessToken, refreshToken })
     } catch (error) {
         next(error)
     }
-
 }
 
 const refreshToken = async (req, res, next) => {

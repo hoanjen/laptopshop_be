@@ -1,6 +1,8 @@
 
 const Brand = require('../models/Brand')
 const Product = require('../models/Product')
+const ProductMedia = require('../models/ProductMedia')
+
 
 
 const show = async (req, res, next) => {
@@ -21,10 +23,24 @@ const show = async (req, res, next) => {
         }
         const product = {
             brand: brand._id,
-            ...req.body.product
+            ...req.body
         }
+        delete product.brandName
+        
         let newProduct = new Product(product)
+    
         await newProduct.save()
+        const tmp = req.files
+        console.log(tmp)
+        for (let i = 0; i < tmp.length; i++){
+            const media = {
+                product: newProduct._id,
+                type: tmp[i].mimetype,
+                url: tmp[i].path
+            }
+            const newMedia = new ProductMedia(media)
+            await newMedia.save()
+        }
         res.status(201).json(newProduct)
     } catch (error) {
         console.log(error)
